@@ -26,7 +26,7 @@ sea := [[water]] / (water | water);
 river := [[water]] / [[water]];
 wound := human + 0.9 0.5 -> 0.5 0.9;
 own := [[human]] / &[[box]];
-light := human / &rays;
+light := sun / &rays;
 equal := [not] | [not];
 friend := human | human;
 circle := box { box };
@@ -117,9 +117,9 @@ leader := human / hands / plan;
 # and := &plan / human | box / box;
 # or := &[[not]] | and;
 §yin := 0.1 0.1 -> 0.1 0.9 -> 0.9 0.9 + 0.9 0.1 -> 0.9 0.9
-    ? {} := 0.0 0.0 => 1.0 1.0 + 0.2 0.2 => 0.2 1.0;
+    ? {} := 0.0 0.0 => 1.0 1.0 + 0.2 0.0 => 0.8 0.8;
 §yang := 0.1 0.1 -> 0.1 0.9 + 0.1 0.1 -> 0.9 0.1 -> 0.9 0.9
-    ? {} := 0.0 0.0 => 1.0 1.0 + 0.2 0.0 => 0.2 0.8;
+    ? {} := 0.0 0.0 => 1.0 1.0 + 0.2 0.2 => 0.8 1.0;
 §word := 0.1 0.1 -> 0.9 0.1 + 0.1 0.4 -> 0.9 0.4 + 0.5 0.4 -> 0.5 0.9;
 against := word | wound;
 good := organ | yin;
