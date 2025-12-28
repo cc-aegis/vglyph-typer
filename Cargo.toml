@@ -1,0 +1,7 @@
+[package]
+name = "vglyph-typer"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+vglyph = { git = "https://github.com/cc-aegis/vglyph" }
