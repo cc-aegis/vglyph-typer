@@ -14,6 +14,7 @@ type Character = (InputSequence, Vec<Line>);
 struct Model {
     characters: HashMap<String, Character>,
     query: Vec<String>,
+    text: Vec<String>,
 }
 
 fn hotkeys() -> &'static HashMap<ScanCode, &'static str> {
@@ -58,6 +59,7 @@ fn model(_app: &App) -> Model {
     Model {
         characters: compile(include_str!("../res/v.glyph")),
         query: Vec::new(),
+        text: Vec::new(),
     }
 }
 
@@ -67,9 +69,15 @@ fn event(_app: &App, model: &mut Model, event: Event) {
             if let Some(name) = hotkeys().get(&scancode) {
                 model.query.push(name.to_string());
             } else if scancode == 14 {
+                if model.query.is_empty() {
+                    let _ = model.text.pop();
+                }
                 let _ = model.query.pop();
             } else if scancode == 57 {
-                model.query.clear();
+                if let Some((c, _)) = model.characters.iter().find(|(_, (i, _))| i.eq(&model.query)) {
+                    model.text.push(c.clone());
+                    model.query.clear();
+                }
             } else {
                 println!("scancode: {scancode}");
             }
@@ -86,6 +94,18 @@ fn view(app: &App, model: &Model, frame: Frame) {
 
     draw.background().color(WHITE);
 
+    for (idx, name) in model.text.iter().enumerate() {
+        let lines = &model.characters.get(name).unwrap().1;
+        for (start, end) in lines {
+            draw.line()
+                .x(idx as f32 * 52.0 + 24.0)
+                .y(24.0)
+                .color(BLACK)
+                .start(Point2::new(start.0 * 48.0, start.1 * 48.0))
+                .end(Point2::new(end.0 * 48.0, end.1 * 48.0));
+        }
+    }
+
     for (idx, (_, (_, lines))) in model
         .characters
         .iter()
@@ -96,8 +116,8 @@ fn view(app: &App, model: &Model, frame: Frame) {
                 .x((idx % 20) as f32 * 52.0 + 24.0)
                 .y((idx / 20) as f32 * 52.0 + 24.0)
                 .color(BLACK)
-                .start(Point2::new(start.0 * 48.0, start.1 * 48.0))
-                .end(Point2::new(end.0 * 48.0, end.1 * 48.0));
+                .start(Point2::new(start.0 * 48.0, start.1 * 48.0 + 96.0))
+                .end(Point2::new(end.0 * 48.0, end.1 * 48.0 + 96.0));
         }
     }
 
