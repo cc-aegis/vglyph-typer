@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 use std::sync::OnceLock;
+use nannou::color::IntoLinSrgba;
+use nannou::draw::properties::ColorScalar;
 use nannou::event::ElementState;
 use vglyph::compile;
 use nannou::prelude::*;
@@ -86,6 +88,17 @@ fn event(_app: &App, model: &mut Model, event: Event) {
     }
 }
 
+fn draw_lines(draw: &Draw, lines: &[Line], xy: (f32, f32), size: (f32, f32), color: impl IntoLinSrgba<ColorScalar> + Clone) {
+    for (start, end) in lines {
+        draw.line()
+            .x(xy.0)
+            .y(xy.1)
+            .color(color.clone())
+            .start(Point2::new(start.0 * size.0, start.1 * size.1))
+            .end(Point2::new(end.0 * size.0, end.1 * size.1));
+    }
+}
+
 fn view(app: &App, model: &Model, frame: Frame) {
     let top_left = app.main_window().rect().top_left();
     let draw = app.draw()
@@ -96,14 +109,7 @@ fn view(app: &App, model: &Model, frame: Frame) {
 
     for (idx, name) in model.text.iter().enumerate() {
         let lines = &model.characters.get(name).unwrap().1;
-        for (start, end) in lines {
-            draw.line()
-                .x(idx as f32 * 52.0 + 24.0)
-                .y(24.0)
-                .color(BLACK)
-                .start(Point2::new(start.0 * 48.0, start.1 * 48.0))
-                .end(Point2::new(end.0 * 48.0, end.1 * 48.0));
-        }
+        draw_lines(&draw, lines, (idx as f32 * 52.0 + 24.0, 24.0), (48.0, 48.0), BLACK);
     }
 
     for (idx, (_, (_, lines))) in model
@@ -111,14 +117,7 @@ fn view(app: &App, model: &Model, frame: Frame) {
         .iter()
         .filter(|(_, (i, _))| i.starts_with(&model.query))
         .enumerate() {
-        for (start, end) in lines {
-            draw.line()
-                .x((idx % 20) as f32 * 52.0 + 24.0)
-                .y((idx / 20) as f32 * 52.0 + 24.0)
-                .color(BLACK)
-                .start(Point2::new(start.0 * 48.0, start.1 * 48.0 + 96.0))
-                .end(Point2::new(end.0 * 48.0, end.1 * 48.0 + 96.0));
-        }
+        draw_lines(&draw, lines, ((idx % 20) as f32 * 52.0 + 24.0, (idx / 20) as f32 * 52.0 + 120.0), (48.0, 48.0), BLACK);
     }
 
     draw.to_frame(app, &frame).unwrap();
